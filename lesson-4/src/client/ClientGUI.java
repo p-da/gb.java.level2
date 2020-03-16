@@ -4,8 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler {
+import static java.awt.event.KeyEvent.VK_ENTER;
+
+public class ClientGUI extends JFrame implements ActionListener, KeyListener, Thread.UncaughtExceptionHandler {
 
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
@@ -45,10 +49,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 "user_with_an_exceptionally_long_name_in_this_chat"};
         userList.setListData(users);
         log.setEditable(false);
+        log.setLineWrap(true);
         JScrollPane scrollLog = new JScrollPane(log);
         JScrollPane scrollUsers = new JScrollPane(userList);
         scrollUsers.setPreferredSize(new Dimension(100, 0));
         cbAlwaysOnTop.addActionListener(this);
+        btnSend.addActionListener(this);
+        tfMessage.addKeyListener(this);
+        tfMessage.setText("");
 
         panelTop.add(tfIPAddress);
         panelTop.add(tfPort);
@@ -73,9 +81,33 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         Object src = e.getSource();
         if (src == cbAlwaysOnTop) {
             setAlwaysOnTop(cbAlwaysOnTop.isSelected());
+        } else if (src == btnSend) {
+            writeNewMessage(tfMessage.getText());
+            tfMessage.setText("");
+            tfMessage.requestFocus();
         }
         else
             throw new RuntimeException("Unknown source: " + src);
+    }
+
+    /**
+     * Метод выполняет запись нового сообщения в тектовую область и в файл
+     * Предполагаю, что данный метод может использоваться и при получении сообщений из сети
+     * @param message - новое сообщение
+     */
+    private void writeNewMessage (String message) {
+        if (message != null && !message.equals("")) {
+            log.append(message + "\n");
+            writeMessageToLogFile(message); // выполним запись в файл
+        }
+    }
+
+    /**
+     * Метод выполняет запись строки в файл
+     * @param message - новое сообщение
+     */
+    private void writeMessageToLogFile(String message) {
+        //TODO здесь я планирую делать запись сообщения в файловый журнал
     }
 
     @Override
@@ -88,6 +120,23 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 e.getMessage() + "\n\t" + ste[0];
         JOptionPane.showMessageDialog(null, msg, "Exception", JOptionPane.ERROR_MESSAGE);
         System.exit(1);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
+        // оставляем с пустой реализацией
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getKeyCode() == VK_ENTER) {
+            btnSend.doClick();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
+        // оставляем с пустой реализацией
     }
 }
 
