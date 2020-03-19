@@ -98,6 +98,7 @@ public class ClientGUI extends JFrame implements ActionListener, KeyListener, Th
     private void writeNewMessage (String message) {
         if (message != null && !message.equals("")) {
             log.append(message + "\n");
+            log.setCaretPosition(log.getDocument().getLength());
             writeMessageToLogFile(message); // выполним запись в файл
         }
     }
