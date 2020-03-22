@@ -59,6 +59,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         btnSend.addActionListener(this);
         tfMessage.addActionListener(this);
         btnLogin.addActionListener(this);
+        btnDisconnect.addActionListener(this);
 
         panelTop.add(tfIPAddress);
         panelTop.add(tfPort);
@@ -75,6 +76,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         add(panelTop, BorderLayout.NORTH);
         add(panelBottom, BorderLayout.SOUTH);
 
+        btnDisconnect.setEnabled(false);
+        tfMessage.setEnabled(false);
+        btnSend.setEnabled(false);
+
         setVisible(true);
     }
 
@@ -87,6 +92,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             sendMessage();
         } else if (src == btnLogin) {
             connect();
+        } else if (src == btnDisconnect) {
+            disconnect();
         }
         else
             throw new RuntimeException("Unknown source: " + src);
@@ -99,6 +106,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         } catch (IOException e) {
             showException(Thread.currentThread(), e);
         }
+    }
+
+    private void disconnect() {
+        socketThread.close();
     }
 
     private void sendMessage() {
@@ -159,11 +170,19 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     @Override
     public void onSocketStart(SocketThread thread, Socket socket) {
         putLog("Start");
+        btnDisconnect.setEnabled(true);
+        tfMessage.setEnabled(true);
+        btnSend.setEnabled(true);
+        panelTop.setVisible(false);
     }
 
     @Override
     public void onSocketStop(SocketThread thread) {
         putLog("Stop");
+        btnDisconnect.setEnabled(false);
+        tfMessage.setEnabled(false);
+        btnSend.setEnabled(false);
+        panelTop.setVisible(true);
     }
 
     @Override

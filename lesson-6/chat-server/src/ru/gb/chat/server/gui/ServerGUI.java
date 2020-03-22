@@ -24,7 +24,6 @@ public class ServerGUI extends JFrame implements ActionListener, Thread.Uncaught
                 new ServerGUI();
             }
         });
-        throw new RuntimeException("Hello from main");
     }
 
     private ServerGUI() {
